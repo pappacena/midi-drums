@@ -1,6 +1,8 @@
 import time
+from typing import Iterable
 
 from PIL import Image
+import numpy as np
 import cv2
 
 
@@ -9,15 +11,11 @@ class ImageSource:
         self.cap = cap
         self.stop_on_null_frame = False
         self.frame_wait_ms = 5
-        self.frames_as_pil = False
     
     def get_next_frame(self):
         ret, frame = self.cap.read()
         if not ret:
             return None
-        if self.frames_as_pil:
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame = Image.fromarray(frame)
         return frame
     
     def set_frame_size(self, width: int, height: int) -> None:
@@ -58,3 +56,9 @@ class Camera(ImageSource):
     def __init__(self, device_id) -> None:
         cap = cv2.VideoCapture(device_id)
         super().__init__(cap)
+
+
+def frame_to_pil_image(frame: np.ndarray) -> Image.Image:
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    frame = Image.fromarray(frame)
+    return frame
