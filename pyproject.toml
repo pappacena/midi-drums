@@ -12,7 +12,11 @@ python-rtmidi = "^1.5.8"
 pillow = "^10.4.0"
 opencv-python-headless = "^4.10.0.84"
 ollama = "^0.3.0"
-
+torch = { version = "^2.2.1", optional = true }
+torchvision = { version="^0.17.1", optional = true }
+transformers = {extras = ["torch"], version = "^4.30.0"}
+scipy = "^1.14.0"
+numpy = "<2.0.0"  # transformers is not compatible with numpy 2
 
 [build-system]
 requires = ["poetry-core"]
