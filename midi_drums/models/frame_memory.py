@@ -131,14 +131,15 @@ class DumsNetTrainer:
         self.model = model
         self.dataset = dataset
         self.loss_fn = nn.MSELoss()
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
-    
+        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=0.001)
+
     def train(self):
-        for epoch in range(50):
-            for i, (inputs, expected_output) in enumerate(zip(self.dataset.inputs, self.dataset.expected_outputs)):
-                self.optimizer.zero_grad()
-                output = self.model(inputs)
-                loss = self.loss_fn(output, expected_output)
-                loss.backward()
+        inputs = torch.stack(self.dataset.inputs)
+        expected_output = torch.stack(self.dataset.expected_outputs)
+        for epoch in range(150):
+            self.optimizer.zero_grad()
+            output = self.model(inputs)
+            loss = self.loss_fn(output, expected_output)
+            loss.backward()
             self.optimizer.step()
             print(f"Epoch {epoch}, loss {loss.item()}")
