@@ -51,7 +51,11 @@ class DatasetManager:
         
         for frame in self.samples:
             image = frame_to_pil_image(frame)
-            inputs = processor(text=[["drumstick"]], images=image, return_tensors="pt").to(DEVICE)
+            inputs = processor(
+                text=[["the top tip of a drumstick"]], 
+                images=image, 
+                return_tensors="pt"
+            ).to(DEVICE)
             with torch.no_grad():
                 outputs = model(**inputs)
             
@@ -66,8 +70,13 @@ class DatasetManager:
             result_boxes = []
             for box, score in zip(boxes, scores):
                 box = [round(i, 2) for i in box.tolist()]
-                result_boxes.append(box)
+                result_boxes.append((score, box))
                 LOGGER.info(
                     f"Detected with confidence {round(score.item(), 3)} at location {box}"
                 )
-            self.drumstick_positions.append(result_boxes)
+            result_boxes = sorted(result_boxes, key=lambda x: x[0], reverse=True)
+            if result_boxes:
+                self.drumstick_positions.append(
+                    # Add only the 2 highest confidence boxes
+                    [result_boxes for _, result_boxes in result_boxes[:2]]
+                )
