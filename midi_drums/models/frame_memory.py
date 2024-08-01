@@ -6,6 +6,9 @@ import torch
 import torch.nn as nn
 from transformers import AutoImageProcessor, ResNetForImageClassification
 
+def sleep(seconds):
+    time.sleep(seconds / 2)
+
 
 class FramesMemory:
     """Memory of the last frames seen, and their embeddings"""
@@ -78,7 +81,7 @@ class DatasetBuilder:
         # Count to 3 and request the symbol hit
         for i in range(3):
             print(f"Hit the #{symbol} symbol starts in {3 - i}...")
-            time.sleep(1)
+            sleep(1)
 
         for i in range(self.samples_per_symbol):
             print("NOW!")
@@ -91,19 +94,19 @@ class DatasetBuilder:
             ).to(self.device)
             self.inputs.append(embeddings)
             self.expected_outputs.append(output)
-            time.sleep(self.hit_sleep)
+            sleep(self.hit_sleep)
 
     def build_dataset(self):
         print(f"Hit the symbol every time you see the message")
         print(f"This is the rythm:")
-        time.sleep(1)
+        sleep(1)
         for i in range(3):
             print("NOW!")
-            time.sleep(self.hit_sleep)
+            sleep(self.hit_sleep)
         print("Now, for real!")
         for i in range(self.max_symbols):
             print("We will now request the symbol number", i)
-            time.sleep(1)
+            sleep(1)
             self.request_symbol(i)
 
 
@@ -124,4 +127,18 @@ class DrumsNet(nn.Module):
     
 
 class DumsNetTrainer:
-    pass
+    def __init__(self, model, dataset):
+        self.model = model
+        self.dataset = dataset
+        self.loss_fn = nn.MSELoss()
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
+    
+    def train(self):
+        for epoch in range(50):
+            for i, (inputs, expected_output) in enumerate(zip(self.dataset.inputs, self.dataset.expected_outputs)):
+                self.optimizer.zero_grad()
+                output = self.model(inputs)
+                loss = self.loss_fn(output, expected_output)
+                loss.backward()
+            self.optimizer.step()
+            print(f"Epoch {epoch}, loss {loss.item()}")

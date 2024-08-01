@@ -1,7 +1,7 @@
 import time
 import torch
 
-from midi_drums.models.frame_memory import DatasetBuilder, DrumsNet, FrameMemoryCapture, FramesMemory
+from midi_drums.models.frame_memory import DatasetBuilder, DrumsNet, DumsNetTrainer, FrameMemoryCapture, FramesMemory
 from midi_drums.video.source import Camera
 
 
@@ -34,7 +34,9 @@ try:
         input_size=len(dataset.inputs[0]),
         output_size=len(dataset.expected_outputs[0]),
     ).to(DEVICE)
-    
+
+    DumsNetTrainer(model, dataset).train()
+
     import ipdb; ipdb.set_trace()
     print(model(dataset.inputs[0]))
 finally:
