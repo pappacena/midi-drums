@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "videolabel"
+version = "0.1.0"
+description = ""
+authors = ["Thiago F Pappacena <pappacena@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+streamlit = "^1.37.1"
+
+[tool.poetry.group.dev.dependencies]
+ipdb = "^0.13.13"
+ipython = "^8.26.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

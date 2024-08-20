@@ -7,7 +7,7 @@ import torch.nn as nn
 from transformers import AutoImageProcessor, ResNetForImageClassification
 
 def sleep(seconds):
-    time.sleep(seconds / 2)
+    time.sleep(seconds)
 
 
 class FramesMemory:
@@ -77,7 +77,7 @@ class DatasetBuilder:
         self.expected_outputs = []
         self.hit_sleep = 0.75
     
-    def request_symbol(self, symbol: int) -> None:
+    def request_symbol(self, symbol: int | None) -> None:
         # Count to 3 and request the symbol hit
         for i in range(3):
             print(f"Hit the #{symbol} symbol starts in {3 - i}...")
@@ -86,9 +86,7 @@ class DatasetBuilder:
         for i in range(self.samples_per_symbol):
             print("NOW!")
             embeddings = self.frame_memory.get_embeddings_copy()
-            embeddings = torch.Tensor(
-                numpy.array([i.cpu().numpy() for i in embeddings])
-            ).flatten().to(self.device)
+            embeddings = torch.stack(embeddings).flatten().to(self.device)
             output = torch.Tensor(
                 [1 if i == symbol else 0 for i in range(self.max_symbols)]
             ).to(self.device)
@@ -104,6 +102,7 @@ class DatasetBuilder:
             print("NOW!")
             sleep(self.hit_sleep)
         print("Now, for real!")
+        self.request_symbol(None)
         for i in range(self.max_symbols):
             print("We will now request the symbol number", i)
             sleep(1)
@@ -136,7 +135,7 @@ class DumsNetTrainer:
     def train(self):
         inputs = torch.stack(self.dataset.inputs)
         expected_output = torch.stack(self.dataset.expected_outputs)
-        for epoch in range(150):
+        for epoch in range(100):
             self.optimizer.zero_grad()
             output = self.model(inputs)
             loss = self.loss_fn(output, expected_output)
